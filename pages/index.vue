@@ -350,7 +350,7 @@ onUnmounted(() => {
 
 </script>
 <style scoped>
-@import url("~/assets/css/main.css");
+@import url("~/assets/Css/main.css");
 html{
        scroll-behavior: smooth;
 }
