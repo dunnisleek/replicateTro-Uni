@@ -1,0 +1,26 @@
+
+  /* CSS Reset */
+  * {
+       margin: 0;
+       padding: 0;
+       box-sizing: border-box;
+   };
+@font-face {
+       font-family: 'CabinetGrotesk';
+       src: url('~/assets/fonts/CabinetGrotesk-Variable.ttf') format('truetype');   
+       font-weight: normal;
+       font-style: normal;
+       /* font-display: swap; */
+       
+   };
+   @font-face {
+       font-family: 'Barlow-Regular';
+       src: url('~/assets/fonts/Barlow-Regular.ttf') format('truetype');   
+       font-weight: normal;
+       font-style: normal;
+   };
+ 
+
+   body{
+       font-family: 'CabinetGrotesk' ;
+   }

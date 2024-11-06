@@ -12,11 +12,11 @@
 
      <!-- start of 2nd section -->
      <div class="second-wrapper">
-       <div>
+       <div class="sidebar">
               <h2>Why Choose Trove University?</h2>
 
-              <h4  :class="{ activeBtn: activeSection === 'section1' }" id="heading1">Expert-Led Learning</h4>
-              <h4 :class="{ activeBtn: activeSection === 'section2' }"  id="heading2">Interactive Lessons</h4>
+              <h4 :class="{activeBtn: currentSection === 'section1'}" @click="goToSection('section1')">Expert-Led Learning</h4>
+              <h4 :class="{activeBtn: currentSection === 'section2'}"  @click="goToSection('section2')">Interactive Lessons</h4>
        </div>
        <div class="border-side">
               <div id="section1">
@@ -26,8 +26,9 @@
               </div>
               <div id="section2">
                      <img src="../assets/dccl--frontend-simple-coffee-listing/interactive_lessons (1).svg"/>
-                     <p>With Trove University, you have access to a wealth of knowledge and resources designed to guide you on your financial journey. Whether you're just starting out or looking to deepen your understanding 
-                     of the financial markets, Trove University is here to support you every step of the way.</p>
+                     <p> Engage with over 150 interactive lessons that make learning about finance and investing fun and effective.
+            Our educational content is designed to be easily digestible, allowing you to learn at your own pace and on
+            your own schedule.</p>
               </div>
 
        </div>
@@ -40,16 +41,16 @@
        <h2>What You'll Learn</h2>
        <div class="inner">
               <div class="two-col">
-              <ul>
-               <li>Investing Basics</li>
-              <li>Advanced Strategies</li>
-              <li>Comprehensive Financial Education</li>
-              <li>Financial Literacy for All Ages</li>
+              <ul class='innerList'>
+               <li :class="{activeList: currentSection === 'investing'}" @click="goToSection('investing')">Investing Basics</li>
+              <li :class="{activeList: currentSection === 'advanced'}"  @click="goToSection('advanced')">Advanced Strategies</li>
+              <li :class="{activeList: currentSection === 'finance'}"   @click="goToSection('finance')">Comprehensive Financial Education</li>
+              <li :class="{activeList: currentSection === 'education'}"  @click="goToSection('education')">Financial Literacy for All Ages</li>
               </ul>
        </div>
    
        <div class="two-col main-content">
-              <div class="inner1">
+              <div class="inner1" id='investing'>
                      <img  class='innerimage' src="../assets/dccl--frontend-simple-coffee-listing/currency-exchange-1.svg"/>
                      
                      <ul>
@@ -60,7 +61,7 @@
                            
                      </ul>
               </div>
-              <div  class="inner1">
+              <div  class="inner1" id="advanced">
                      <img  class='innerimage' src="../assets/dccl--frontend-simple-coffee-listing/profit-calculation.svg"/>
                     
                      <ul>
@@ -72,7 +73,7 @@
                      </ul>
               </div>
 
-              <div  class="inner1">
+              <div  class="inner1" id="finance">
                      <img  class='innerimage' src="../assets/dccl--frontend-simple-coffee-listing/problem-solution-1.svg"/>
                    
                      <ul>
@@ -83,11 +84,11 @@
                            
                      </ul>
               </div>
-              <div  class="inner1">
+              <div  class="inner1" id="education">
                      <img  class='innerimage' src="../assets/dccl--frontend-simple-coffee-listing/partnership-agreement.svg"/>
                      
                      <ul>
-                            <h3>Comprehensive Financial Education</h3>
+                            <h3>Financial Literacy for All Ages</h3>
                             <li><img src='../assets/dccl--frontend-simple-coffee-listing/check.svg'/>Investing Strategies Explore various strategies to maximize your investment returns.</li>
                             <li><img src='../assets/dccl--frontend-simple-coffee-listing/check.svg'/>Picking Stocks Gain skills in selecting stocks that fit your investment goals.</li>
                             <li><img src='../assets/dccl--frontend-simple-coffee-listing/check.svg'/>Reading Stocks Learn how to analyze stock performance and make informed decisions.</li>
@@ -300,36 +301,56 @@
 
 </template>
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import {ref,onMounted, onUnmounted} from 'vue'
 definePageMeta({
         layout : false,
 });
 
-// Track the active section for applying the active class
-const activeSection = ref(null);
+// State to track the current section
+ const currentSection = ref(null);
 
-const updateActiveHeading = () => {
-  const section1 = document.getElementById('section1').offsetTop;
-  const section2 = document.getElementById('section2').offsetTop;
-  const scrollPosition = window.scrollY + 100; // Buffer for smoothness
 
-  if (scrollPosition >= section1 && scrollPosition < section2) {
-    activeSection.value = 'section1';
-  } else if (scrollPosition >= section2) {
-    activeSection.value = 'section2';
+const goToSection = (id) => {
+       currentSection.value = id;  // Update the active section
+  const element = document.getElementById(id);
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 };
 
-// Add scroll event listener on mount and remove on unmount
+
+const observeSections = () => {
+  const options = { root: null, rootMargin: '0px', threshold: 0.9 }; // Adjust threshold as needed
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        currentSection.value = entry.target.id;
+      }
+    });
+  }, options);
+
+  // Observe each section
+  const sections = document.querySelectorAll('.border-side > div');
+  const layers = document.querySelectorAll('.two-col > div');
+  sections.forEach((section) => observer.observe(section));
+  layers.forEach((section) => observer.observe(section));
+
+  return observer; // To unobserve when component is unmounted
+};
+
+let observer;
 onMounted(() => {
-  window.addEventListener('scroll', updateActiveHeading);
+  observer = observeSections();
 });
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', updateActiveHeading);
+  if (observer) observer.disconnect();
 });
+
 </script>
 <style scoped>
+@import url("~/assets/css/main.css");
 html{
        scroll-behavior: smooth;
 }
@@ -344,6 +365,7 @@ html{
        padding-top:200px;
 }
 .herowrapper .orangeBg {
+       font-family: 'CabinetGrotesk';
        background: #EA8D51;
        font-size: 18px;
        line-height: 21px;
@@ -353,11 +375,17 @@ html{
 .herowrapper h1{
        font-size: 86px;
        line-height: 90px;
+       font-family: 'CabinetGrotesk' ;
+       padding-bottom: 10px;
        width:700px;
        max-width: 700px;
        text-align: center;
 }
 .para{
+       font-family: 'Barlow-Regular', sans-serif !important;
+       font-weight: 400;
+       font-size: 18px;
+       color:#ffffffe0;
        text-align: center;
        width:600px;
        max-width: 600px;
@@ -386,19 +414,26 @@ html{
        border:1px solid rgba(128, 128, 128, 0.445);
        border-radius: 15px;
        padding:50px;
-       margin-bottom: 45px;
+       margin-bottom: 145px;
     
 }
 .border-side img{
        padding-bottom: 30px;
 }
 .border-side p{
+       font-family: 'Barlow-Regular';
        font-size:18px;
        line-height: 21px;
 }
 .second-wrapper h4{
        cursor:pointer;
        font-size: 22px;
+       width:260px;
+       padding:18px;
+       margin-bottom: 4rem; /* Default spacing */
+}
+h4.activeBtn {
+  margin-bottom: 4rem; /* Increase spacing when active */
 }
 .activeBtn{
        width:260px;
@@ -406,18 +441,31 @@ html{
        border-radius: 50px;
        padding:18px;
        color:#262626;
-       margin-bottom: 50px;
+       margin-bottom: 4rem;
   
 }
+/* style for vertical scrolling */
+.second-wrapper div.sidebar{
+       position:sticky;
+       top:40%;
+       height:360px;
+       width: min(50%, 400px);
+       transition: 0.3s;
+}
+
+/* ENDstyle for vertical scrolling */
+
 .third-section{
        background:#00030B;
        color:#ffffff;
        padding:100px 0px;
 }
 .third-section h2{
+       font-family:"CabinetGrotesk";
        text-align: center;
        font-size: 51px;
        line-height: 60px;
+       padding-bottom:5rem;
 
 }
 .third-section .inner{
@@ -427,11 +475,13 @@ html{
       display: flex;
       justify-content: space-between;
       box-sizing: border-box;
+    
       
 }
 .third-section ul{
     padding: 0;
     list-style-type: none;
+    width:fit-content;
     display: flex;
     flex-direction: column;
     gap: 3rem;
@@ -453,17 +503,32 @@ html{
        border-radius: 20px;
        width: 100%;
        padding: 1.5rem;
+       margin-bottom:4rem;
        display: flex;
        align-content: center;
-     
        gap:3rem;
+     
 }
 .inner1 ul {
+       font-family: 'Barlow-Regular', sans-serif;
        gap:20px;
        font-size: 16px;
        line-height: 24px;
+       width:fit-content;
    
 }
+
+
+.activeList{
+       color:#091438;
+       background:#ffffff;
+       cursor: pointer;
+       width:fit-content;
+       border-radius: 50px;
+       padding:15px;
+       
+}
+
 .innerimage{
        width:250px;
 }
@@ -472,6 +537,17 @@ html{
 }
 .inner1 h3{
        font-size:24px;
+       font-family: "Cabinet Grotesk";
+}
+.innerList{
+       font-family: "Cabinet Grotesk";
+       width:fit-content;
+       cursor: pointer;
+       position:sticky;
+       top:40%;
+       /* height:1960px; */
+     
+       transition: 0.3s;
 }
 /* 
 start of earn section */
@@ -506,6 +582,7 @@ div.content {
      justify-content: center;
 }
 .firstCol h2{
+       font-family: "CabinetGrotesk";
        font-size:50px;
        line-height: 60px;
        width:500px;
@@ -513,6 +590,7 @@ div.content {
        padding-bottom: 20px;
 }
 .firstCol p{
+       font-family: "Barlow-Regular", sans-serif;
        font-size: 18px;
        line-height: 21px;
        width:500px;
@@ -613,6 +691,7 @@ div.content {
        padding:150px 0px;
 }
 .works-sectn h3{
+       font-family: 'CabinetGrotesk';
        font-size:50px;
        line-height: 60px;
        text-align:center;
@@ -641,11 +720,13 @@ div.content {
        text-align: left;
 }
 .flex-col h2{
+       font-family: 'CabinetGrotesk';
        font-size:40px;
        line-height: 50px;
        
 }
 .flex-col p{
+       font-family: Barlow-Regular;
        font-size:18px;
        width:320px;
        max-width:320px;
@@ -664,6 +745,7 @@ hr{
        
 }
 .benefit-wrapper h3{
+       font-family: CabinetGrotesk;
        color:#ffffff;
        text-align: center;
        font-size:50px;
@@ -674,6 +756,7 @@ hr{
        margin: 0 auto;
 }
 .benefit-wrapper p{
+       font-family: Barlow-Regular;
        font-size: 16px;
        color:#ffffff;
        text-align: center;
@@ -700,6 +783,9 @@ hr{
        width:300px;
        padding-top: 15px;
 }
+.icon-wrapper h2{
+       font-family: CabinetGrotesk;
+}
 .hoWork{
        background:#091438;
        color:#ffffff;
@@ -707,6 +793,7 @@ hr{
        
 }
 .hoWork h3{
+       font-family: CabinetGrotesk;
        text-align: center;
        font-size:50px;
        margin:0px;
@@ -738,6 +825,12 @@ hr{
 .work-wrapper img{
        width:50px;
 }
+.work-wrapper h2{
+       font-family: CabinetGrotesk;
+}
+.work-wrapper p{
+       font-family: Barlow-Regular;
+}
 .community-section{
        background: #00030B;
        color:#ffffff;
@@ -753,8 +846,10 @@ hr{
 }
 .com-wrapper h3{
        font-size:50px;
+       font-family: CabinetGrotesk;
 }
 .com-wrapper p{
+       font-family: Barlow-Regular;
        width:650px;
        max-width: 650px;
        padding-top:20px;

@@ -57,10 +57,11 @@
   margin: 0 auto;
 }
 .wrap p {
+  font-family: Barlow-Regular;
   width: 800px;
   margin: 0 auto;
-  font-size:14px;
-  line-height: 15px;
+  font-size:10px;
+  line-height:20px;
   color:#b0afaf
 }
 hr{
